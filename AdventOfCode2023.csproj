@@ -12,14 +12,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Solutions\Day.template" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Compile Include="Solutions\Day.template" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <PackageReference Include="morelinq" Version="4.0.0" />
 	  <PackageReference Include="Spectre.Console" Version="0.48.0" />
 	</ItemGroup>
