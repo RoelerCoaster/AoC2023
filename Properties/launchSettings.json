@@ -1,0 +1,134 @@
+{
+  "profiles": {
+    "Latest": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day01": {
+      "commandName": "Project",
+      "commandLineArgs": "1",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day02": {
+      "commandName": "Project",
+      "commandLineArgs": "2",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day03": {
+      "commandName": "Project",
+      "commandLineArgs": "3",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day04": {
+      "commandName": "Project",
+      "commandLineArgs": "4",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day05": {
+      "commandName": "Project",
+      "commandLineArgs": "5",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day06": {
+      "commandName": "Project",
+      "commandLineArgs": "6",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day07": {
+      "commandName": "Project",
+      "commandLineArgs": "7",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day08": {
+      "commandName": "Project",
+      "commandLineArgs": "8",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day09": {
+      "commandName": "Project",
+      "commandLineArgs": "9",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day10": {
+      "commandName": "Project",
+      "commandLineArgs": "10",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day11": {
+      "commandName": "Project",
+      "commandLineArgs": "11",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day12": {
+      "commandName": "Project",
+      "commandLineArgs": "12",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day13": {
+      "commandName": "Project",
+      "commandLineArgs": "13",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day14": {
+      "commandName": "Project",
+      "commandLineArgs": "14",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day15": {
+      "commandName": "Project",
+      "commandLineArgs": "15",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day16": {
+      "commandName": "Project",
+      "commandLineArgs": "16",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day17": {
+      "commandName": "Project",
+      "commandLineArgs": "17",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day18": {
+      "commandName": "Project",
+      "commandLineArgs": "18",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day19": {
+      "commandName": "Project",
+      "commandLineArgs": "19",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day20": {
+      "commandName": "Project",
+      "commandLineArgs": "20",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day21": {
+      "commandName": "Project",
+      "commandLineArgs": "21",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day22": {
+      "commandName": "Project",
+      "commandLineArgs": "22",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day23": {
+      "commandName": "Project",
+      "commandLineArgs": "23",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day24": {
+      "commandName": "Project",
+      "commandLineArgs": "24",
+      "workingDirectory": "$(SolutionDir)"
+    },
+    "Day25": {
+      "commandName": "Project",
+      "commandLineArgs": "25",
+      "workingDirectory": "$(SolutionDir)"
+    }
+  }
+}
