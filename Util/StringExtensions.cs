@@ -1,5 +1,7 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace RoelerCoaster.AdventOfCode.Year2023.Util;
 
@@ -37,6 +39,18 @@ public static class StringExtensions
     public static int[] Digits(this string s)
     {
         return s.Select(s => s.ToString().ToNumber<int>()).ToArray();
+    }
+
+    public static TNumber[] NumbersBySeparator<TNumber>(this string s, string separator)
+        where TNumber : INumber<TNumber>, IParsable<TNumber>
+    {
+        return s.Split(separator).Select(n => n.ToNumber<TNumber>()).ToArray();
+    }
+
+    public static TNumber[] NumbersByRegex<TNumber>(this string s, [StringSyntax(StringSyntaxAttribute.Regex)] string pattern)
+        where TNumber : INumber<TNumber>, IParsable<TNumber>
+    {
+        return Regex.Split(s, pattern).Select(n => n.ToNumber<TNumber>()).ToArray();
     }
 
     public static string SliceLines(this string s, int start, int? end)
