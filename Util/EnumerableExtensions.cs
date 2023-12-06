@@ -12,4 +12,9 @@ internal static class EnumerableExtensions
     {
         return elements.Aggregate(TNumber.One, (acc, val) => acc * numberSelector(val));
     }
+
+    public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> nullableElements)
+    {
+        return nullableElements.Where(e => e is not null)!;
+    }
 }
