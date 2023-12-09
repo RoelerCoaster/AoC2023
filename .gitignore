@@ -362,5 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Ignore testinputs
-Inputs/Test/*.txt
+# Ignore inputs
+Inputs/**/*.txt
