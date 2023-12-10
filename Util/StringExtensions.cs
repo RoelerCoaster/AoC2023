@@ -58,4 +58,9 @@ public static class StringExtensions
         var lines = s.Lines();
         return string.Join(Environment.NewLine, s.Lines()[start..(end ?? lines.Length)]);
     }
+
+    public static char[][] Grid(this string s)
+    {
+        return s.Lines().Select(l => l.ToArray()).ToArray();
+    }
 }
