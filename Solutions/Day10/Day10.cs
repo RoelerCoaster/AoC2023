@@ -1,5 +1,6 @@
 using RoelerCoaster.AdventOfCode.Year2023.Internals.Model;
 using RoelerCoaster.AdventOfCode.Year2023.Util;
+using RoelerCoaster.AdventOfCode.Year2023.Util.Model;
 
 namespace RoelerCoaster.AdventOfCode.Year2023.Solutions.Day10;
 
@@ -196,8 +197,6 @@ internal class Day10 : DayBase
         }
     }
 }
-
-internal record GridCoordinate(int Row, int Col);
 
 internal class MarkState
 {

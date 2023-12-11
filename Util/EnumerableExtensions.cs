@@ -17,4 +17,22 @@ internal static class EnumerableExtensions
     {
         return nullableElements.Where(e => e is not null)!;
     }
+
+    public static IEnumerable<(T, T)> UnorderedPairs<T>(this IEnumerable<T> elements, bool skipSelf)
+    {
+        var list = elements.ToList();
+
+        for (var i = 0; i < list.Count; i++)
+        {
+            for (var j = i; j < list.Count; j++)
+            {
+                if (i == j && skipSelf)
+                {
+                    continue;
+                }
+
+                yield return (list[i], list[j]);
+            }
+        }
+    }
 }
