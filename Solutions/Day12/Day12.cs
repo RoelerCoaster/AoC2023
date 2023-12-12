@@ -14,11 +14,12 @@ internal class Day12 : DayBase
 
     protected override async Task<string> SolvePart1(string input)
     {
+        var memory = new Dictionary<string, long>();
         var arangementCounts = input.Lines()
             .Select(line =>
             {
                 var split = line.Split(" ");
-                return AnalyzeArrangements(split[0], split[1].NumbersBySeparator<int>(",").ToList());
+                return AnalyzeArrangements(split[0], split[1].NumbersBySeparator<int>(",").ToList(), memory);
             })
             .ToList();
 
@@ -27,22 +28,31 @@ internal class Day12 : DayBase
 
     protected override async Task<string> SolvePart2(string input)
     {
+        var memory = new Dictionary<string, long>();
         var arangementCounts = input.Lines()
             .Select(line =>
             {
                 var split = line.Split(" ");
-                var springs = string.Join('?', Enumerable.Repeat(split[0], 5));
-                var numbers = string.Join(',', Enumerable.Repeat(split[1], 5));
-                return AnalyzeArrangements(springs, numbers.NumbersBySeparator<int>(",").ToList());
+
+                var unfoldedSprings = string.Join('?', Enumerable.Repeat(split[0], 5));
+                var unfoldedNumbers = string.Join(',', Enumerable.Repeat(split[1], 5));
+
+                return AnalyzeArrangements(unfoldedSprings, unfoldedNumbers.NumbersBySeparator<int>(",").ToList(), memory);
             })
             .ToList();
 
         return arangementCounts.Sum().ToString();
     }
-
-    private int AnalyzeArrangements(string row, List<int> groups)
+    private long AnalyzeArrangements(string row, List<int> groups, Dictionary<string, long> memory)
     {
         var trimmed = row.Trim('.');
+
+        var key = row + '|' + string.Join(',', groups);
+
+        if (memory.TryGetValue(key, out var value))
+        {
+            return value;
+        }
 
         if (groups.Count == 0)
         {
@@ -74,8 +84,11 @@ internal class Day12 : DayBase
         if (trimmed[0] == '?')
         {
             // first character is unknown. Simply try both possibilities.
-            return AnalyzeArrangements('#' + trimmed.Substring(1), groups) +
-                AnalyzeArrangements(trimmed.Substring(1), groups);
+            var result = AnalyzeArrangements('#' + trimmed.Substring(1), groups, memory) +
+                AnalyzeArrangements(trimmed.Substring(1), groups, memory);
+
+            memory.Add(key, result);
+            return result;
 
         }
 
@@ -90,7 +103,9 @@ internal class Day12 : DayBase
         var match = Regex.Match(trimmed, $"^[#?]{{{firstGroup}}}([.?]|$)");
         if (match.Success)
         {
-            return AnalyzeArrangements(trimmed.Substring(match.Length), groups.Skip(1).ToList());
+            var result = AnalyzeArrangements(trimmed.Substring(match.Length), groups.Skip(1).ToList(), memory);
+            memory.Add(key, result);
+            return result;
         }
 
         // Invalid solution. Group could not be matched.
