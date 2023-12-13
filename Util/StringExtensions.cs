@@ -61,6 +61,29 @@ public static class StringExtensions
 
     public static char[][] Grid(this string s)
     {
-        return s.Lines().Select(l => l.ToArray()).ToArray();
+        return s.Lines().Select(l => l.ToCharArray()).ToArray();
+    }
+
+    /// <summary>
+    /// Splits the string right before the given index. This means s[index] will be the 
+    /// first character of the Right result;
+    /// </summary>
+    public static (string Left, string Right) SplitBefore(this string s, int index)
+    {
+        return (s.Substring(0, index), s.Substring(index));
+    }
+
+    public static string LimitLength(this string s, int maxLength)
+    {
+        return s.Length > maxLength
+            ? s.Substring(0, maxLength)
+            : s;
+    }
+
+    public static string Reverse(this string s)
+    {
+        var array = s.ToCharArray();
+        Array.Reverse(array);
+        return new string(array);
     }
 }
