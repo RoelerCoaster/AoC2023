@@ -35,4 +35,9 @@ internal static class EnumerableExtensions
             }
         }
     }
+
+    public static string StringJoin<T>(this IEnumerable<T> elements, string separator)
+    {
+        return string.Join(separator, elements);
+    }
 }
