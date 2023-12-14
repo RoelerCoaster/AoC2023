@@ -13,7 +13,7 @@ internal class Day14 : DayBase
 
     protected override async Task<string> SolvePart1(string input)
     {
-        return GetTotalLoad(input.Grid()).ToString();
+        return GetTotalNorthLoad(input.Grid()).ToString();
     }
 
     protected override async Task<string> SolvePart2(string input)
