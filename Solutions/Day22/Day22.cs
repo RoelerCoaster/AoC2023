@@ -6,9 +6,9 @@ internal class Day22 : DayBase
 {
     public override int Day => 22;
 
-    public override bool UseTestInput => false;
+    public override bool UseTestInput => true;
 
-    protected override PartToRun PartsToRun => PartToRun.Both;
+    protected override PartToRun PartsToRun => PartToRun.None;
 
     protected override async Task<string> SolvePart1(string input)
     {
