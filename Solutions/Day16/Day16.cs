@@ -11,7 +11,7 @@ internal class Day16 : DayBase
 
     public override bool UseTestInput => false;
 
-    protected override PartToRun PartsToRun => PartToRun.Part1;
+    protected override PartToRun PartsToRun => PartToRun.Both;
 
     protected override async Task<string> SolvePart1(string input)
     {
@@ -23,7 +23,26 @@ internal class Day16 : DayBase
 
     protected override async Task<string> SolvePart2(string input)
     {
-        throw new NotImplementedException();
+        var grid = input.Grid();
+
+        var initialBeams = new List<BeamState>();
+
+        for (var r = 0; r < grid.Length; r++)
+        {
+            initialBeams.Add(new BeamState(r, -1, CardinalDirection.East));
+            initialBeams.Add(new BeamState(r, grid[r].Length, CardinalDirection.West));
+        }
+
+        for (var c = 0; c < grid[0].Length; c++)
+        {
+            initialBeams.Add(new BeamState(-1, c, CardinalDirection.South));
+            initialBeams.Add(new BeamState(grid[0].Length, c, CardinalDirection.North));
+        }
+
+        var results = initialBeams.Select(b => GetEnergizedCells(grid, b).Count);
+
+        return results.Max().ToString();
+
     }
 
     private HashSet<GridCoordinate> GetEnergizedCells(char[][] grid, BeamState initialBeam)
