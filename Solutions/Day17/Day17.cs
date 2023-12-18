@@ -89,14 +89,14 @@ internal class Day17 : DayBase
     {
         var potentialNeighbors = new List<CrucibleData>
         {
-            new (CoordinateInDirection(current, current.Direction), current.StepsRemaining - 1, current.Direction)
+            new (current.CoordinateInDirection(current.Direction), current.StepsRemaining - 1, current.Direction)
         };
 
         if (current.StepsRemaining <= maxSteps - minSteps)
         {
             potentialNeighbors.AddRange([
-                new(CoordinateInDirection(current, current.Direction.RotateClockwise()), maxSteps - 1, current.Direction.RotateClockwise()),
-                new(CoordinateInDirection(current, current.Direction.RotateCounterClockwise()), maxSteps - 1, current.Direction.RotateCounterClockwise()),
+                new(current.CoordinateInDirection(current.Direction.RotateClockwise()), maxSteps - 1, current.Direction.RotateClockwise()),
+                new(current.CoordinateInDirection(current.Direction.RotateCounterClockwise()), maxSteps - 1, current.Direction.RotateCounterClockwise()),
             ]);
         }
 
@@ -112,19 +112,6 @@ internal class Day17 : DayBase
 
         }
     }
-
-    private GridCoordinate CoordinateInDirection(GridCoordinate current, CardinalDirection direction)
-    {
-        return direction switch
-        {
-            CardinalDirection.North => current with { Row = current.Row - 1 },
-            CardinalDirection.South => current with { Row = current.Row + 1 },
-            CardinalDirection.West => current with { Col = current.Col - 1 },
-            CardinalDirection.East => current with { Col = current.Col + 1 },
-            _ => throw new NotSupportedException()
-        }; ;
-    }
-
 
     private void PrintPath(int[][] grid, CrucibleData dest, Dictionary<CrucibleData, CellData> cellData)
     {

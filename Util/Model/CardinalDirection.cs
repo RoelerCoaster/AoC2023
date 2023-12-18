@@ -2,5 +2,5 @@
 
 internal enum CardinalDirection
 {
-    North, East, South, West
+    North = 1, East, South, West
 }
