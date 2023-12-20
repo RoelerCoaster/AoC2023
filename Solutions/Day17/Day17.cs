@@ -11,7 +11,7 @@ internal class Day17 : DayBase
 
     public override bool UseTestInput => false;
 
-    protected override PartToRun PartsToRun => PartToRun.Part2;
+    protected override PartToRun PartsToRun => PartToRun.Both;
 
     protected override async Task<string> SolvePart1(string input)
     {
@@ -35,7 +35,8 @@ internal class Day17 : DayBase
     private int MinHeatLoss(int[][] grid, GridCoordinate start, GridCoordinate dest, int minSteps, int maxSteps)
     {
         var crucibleStart = new CrucibleData(start, maxSteps, CardinalDirection.East);
-        var openSet = new HashSet<CrucibleData> { crucibleStart };
+        var openSet = new C5.IntervalHeap<Prio> { new(crucibleStart, 0) };
+        var openSetHandles = new Dictionary<CrucibleData, C5.IPriorityQueueHandle<Prio>>();
 
         var cellData = new Dictionary<CrucibleData, CellData>(grid.Length * grid[0].Length * maxSteps * 4);
         for (var r = 0; r < grid.Length; r++)
@@ -56,15 +57,14 @@ internal class Day17 : DayBase
 
         while (openSet.Count > 0)
         {
-            var current = openSet.MinBy(c => cellData[c].FScore)!;
+            var current = openSet.DeleteMin()!.Data;
+            openSetHandles.Remove(current);
             var currentCellData = cellData[current];
 
             if (new GridCoordinate(current.Row, current.Col) == dest && current.StepsRemaining <= maxSteps - minSteps)
             {
                 return currentCellData.GScore;
             }
-
-            openSet.Remove(current);
 
             foreach (var neighbor in GetNeighbors(current, minSteps, maxSteps, grid.Length - 1, grid[0].Length - 1))
             {
@@ -75,9 +75,18 @@ internal class Day17 : DayBase
                     neighborCellData.Parent = current;
                     neighborCellData.GScore = gScore;
                     // Manhattan distance as heuristic
-                    neighborCellData.FScore = gScore + Math.Abs(dest.Row - neighbor.Row) + Math.Abs(dest.Col - neighbor.Col);
+                    var fScore = gScore + Math.Abs(dest.Row - neighbor.Row) + Math.Abs(dest.Col - neighbor.Col);
 
-                    openSet.Add(neighbor);
+                    if (openSetHandles.TryGetValue(neighbor, out var handle))
+                    {
+                        openSet[handle] = openSet[handle] with { Priority = fScore };
+                    }
+                    else
+                    {
+                        openSet.Add(ref handle, new Prio(neighbor, fScore));
+                        openSetHandles.Add(neighbor, handle);
+                    }
+
                 }
             }
         }
@@ -130,11 +139,18 @@ internal class Day17 : DayBase
     }
 }
 
+internal record Prio(CrucibleData Data, int Priority) : IComparable<Prio>
+{
+    public int CompareTo(Prio? other)
+    {
+        return Priority.CompareTo(other?.Priority);
+    }
+};
+
 internal class CellData
 {
     public CrucibleData? Parent { get; set; }
     public int GScore { get; set; } = int.MaxValue;
-    public int FScore { get; set; } = int.MaxValue;
 }
 
 internal record CrucibleData(int Row, int Col, int StepsRemaining, CardinalDirection Direction) : GridCoordinate(Row, Col)
