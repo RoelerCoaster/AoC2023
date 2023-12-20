@@ -1,3 +1,4 @@
+using MoreLinq;
 using RoelerCoaster.AdventOfCode.Year2023.Internals.Model;
 using RoelerCoaster.AdventOfCode.Year2023.Util;
 using RoelerCoaster.AdventOfCode.Year2023.Util.Model;
@@ -8,9 +9,9 @@ internal class Day18 : DayBase
 {
     public override int Day => 18;
 
-    public override bool UseTestInput => true;
+    public override bool UseTestInput => false;
 
-    protected override PartToRun PartsToRun => PartToRun.Part2;
+    protected override PartToRun PartsToRun => PartToRun.Both;
 
     protected override async Task<string> SolvePart1(string input)
     {
@@ -22,8 +23,8 @@ internal class Day18 : DayBase
            })
            .ToArray();
 
-        var edge = TraceEdge(actions);
-        var area = GetArea(edge);
+        var edgeCorners = TraceEdgeCorners(actions);
+        var area = GetAreaV2(edgeCorners);
 
         return area.ToString();
     }
@@ -45,94 +46,97 @@ internal class Day18 : DayBase
            })
            .ToArray();
 
-        var edge = TraceEdge(actions);
-        var area = GetArea(edge);
+        var edgeCorners = TraceEdgeCorners(actions);
+        var area = GetAreaV2(edgeCorners);
 
         return area.ToString();
     }
 
-    private List<GridCoordinate> TraceEdge((CardinalDirection Direction, int steps)[] actions)
+    private List<GridCoordinate> TraceEdgeCorners((CardinalDirection Direction, int steps)[] actions)
     {
         var current = new GridCoordinate(0, 0);
         var edge = new List<GridCoordinate> { current };
 
-
-
-
         foreach (var (direction, steps) in actions)
         {
-            for (var i = 0; i < steps; i++)
-            {
-                current = current.CoordinateInDirection(direction);
-                edge.Add(current);
-            }
+            current = current.CoordinateInDirection(direction, steps);
+            edge.Add(current);
         }
 
         return edge;
     }
 
-    private int GetArea(List<GridCoordinate> edge)
+    private long GetAreaV2(List<GridCoordinate> edgeCorners)
     {
-        var edgeSet = edge.ToHashSet();
+        var cornerGroups = edgeCorners
+            .Distinct()
+            .GroupBy(e => e.Row)
+            .OrderBy(g => g.Key)
+            .Select(g => (Row: g.Key, Corners: g.OrderBy(c => c.Col).ToList()))
+            .ToList();
 
-        var minRow = edge.Min(e => e.Row);
-        var maxRow = edge.Max(e => e.Row);
-        var minCol = edge.Min(e => e.Col);
-        var maxCol = edge.Max(e => e.Col);
+        var firstGroup = cornerGroups[0];
 
-        var total = 0;
+        var initialRanges = firstGroup.Corners.Batch(2).Select(batch => new Range(batch[0].Col, batch[1].Col));
 
+        var activeRanges = new List<Range>(initialRanges);
+        long area = initialRanges.Sum(r => r.Length);
+        var prevRow = firstGroup.Row;
 
-        for (var r = minRow; r <= maxRow; r++)
+        foreach (var (row, corners) in cornerGroups[1..])
         {
-            var isInside = false;
-            CardinalDirection? cornerDirectionStart = null;
+            long currentActiveRangesLength = activeRanges.Sum(r => r.Length);
 
-            for (var c = minCol; c <= maxCol; c++)
-            {
-                var coordinate = new GridCoordinate(r, c);
-                var onEdge = edgeSet.Contains(coordinate);
-                if (isInside || onEdge)
-                {
-                    total++;
-                }
+            area += currentActiveRangesLength * (row - prevRow - 1);
 
-                if (onEdge)
-                {
-                    var northSouth = new[] {
-                        CardinalDirection.North,
-                        CardinalDirection.South
-                    }.Where(d => edgeSet.Contains(coordinate.CoordinateInDirection(d)))
-                    .ToHashSet();
+            var columnIndices = activeRanges
+                .SelectMany(r => new[] { r.Start, r.End })
+                .Concat(
+                    corners.Select(c => c.Col)
+                ).Order();
 
-                    if (cornerDirectionStart is null)
-                    {
-                        if (northSouth.Count == 2)
-                        {
-                            // straight edge
-                            isInside = !isInside;
-                        }
-                        else
-                        {
-                            // start corner
-                            cornerDirectionStart = northSouth.Single();
-                        }
+            var unmerged = columnIndices
+                .Batch(2)
+                .Select(batch => new Range(batch[0], batch[1]))
+                .Where(r => r.Length > 1)
+                .ToList();
 
-                    }
-                    else if (northSouth.Count == 1)
-                    {
-                        if (northSouth.Single() == cornerDirectionStart.Value.Flip())
-                        {
-                            // end corner going oposite direction. Treat as straight edge.
-                            isInside = !isInside;
-                        }
-                        cornerDirectionStart = null;
-                    }
-                }
-            }
+            var merged = MergeRanges(unmerged).ToList();
+
+            area += MergeRanges(merged.Concat(activeRanges)).Sum(r => r.Length);
+
+            activeRanges = merged;
+            prevRow = row;
         }
 
-        return total;
+        return area;
+    }
+
+    private IEnumerable<Range> MergeRanges(IEnumerable<Range> ranges)
+    {
+        var sortedData = ranges.SelectMany<Range, (int index, bool isEnd)>(r => new[] { (r.Start, false), (r.End, true) })
+            .OrderBy(x => x.index)
+            .ThenBy(x => x.isEnd)
+            .ToList();
+
+        int? start = null;
+        var startCount = 0;
+
+        foreach (var (index, isEnd) in sortedData)
+        {
+            if (start == null)
+            {
+                start = index;
+            }
+
+            startCount += isEnd ? -1 : 1;
+
+            if (startCount == 0)
+            {
+                yield return new Range(start.Value, index);
+                start = null;
+            }
+        }
     }
 
     private CardinalDirection CharToDirection(char c)
@@ -146,4 +150,9 @@ internal class Day18 : DayBase
             _ => throw new NotSupportedException()
         };
     }
+}
+
+internal record Range(int Start, int End)
+{
+    public int Length => End - Start + 1;
 }
