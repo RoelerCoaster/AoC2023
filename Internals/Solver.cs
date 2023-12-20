@@ -1,6 +1,7 @@
 ﻿using RoelerCoaster.AdventOfCode.Year2023.Internals.Model;
 using RoelerCoaster.AdventOfCode.Year2023.Solutions;
 using Spectre.Console;
+using Spectre.Console.Rendering;
 
 namespace RoelerCoaster.AdventOfCode.Year2023.Internals;
 
@@ -48,77 +49,66 @@ internal class Solver
         var table = new Table()
             .AddColumns("Part", "Solution", "Time");
 
-        var exceptions = new List<Exception>();
+        var solutions = new List<PartSolution>();
 
-        await AnsiConsole.Live(table)
-            .StartAsync(async ctx =>
-            {
-                var parts = new[]
+        var parts = new[]
                 {
                     PartToRun.Part1,
                     PartToRun.Part2
                 };
 
+        foreach (var part in parts)
+        {
 
-                foreach (var part in parts)
+
+            var partNumber = part switch
+            {
+                PartToRun.Part1 => 1,
+                PartToRun.Part2 => 2,
+                _ => throw new InvalidOperationException("Invalid part")
+            };
+
+            AnsiConsole.Write(new Rule($"Part {partNumber}"));
+
+            await AnsiConsole.Status()
+                .StartAsync($"[orangered1]Running Part {partNumber}...[/]", async ctx =>
                 {
-                    var partNumber = part switch
-                    {
-                        PartToRun.Part1 => 1,
-                        PartToRun.Part2 => 2,
-                        _ => throw new InvalidOperationException("Invalid part")
-                    };
-
-                    table.AddRow(partNumber.ToString(), "[orangered1]Running...[/]", "[orangered1]Running...[/]");
-                    ctx.Refresh();
-
                     var solution = await day.RunPart(part, input);
-
-                    WriteSolution(table, solution, partNumber);
-                    ctx.Refresh();
 
                     if (solution.Exception != null)
                     {
-                        exceptions.Add(solution.Exception);
+                        AnsiConsole.WriteException(solution.Exception);
+                        AnsiConsole.WriteLine();
                     }
-                }
-            });
 
-        if (exceptions.Any())
-        {
-            AnsiConsole.Write(new Rule("[red]Exceptions[/]"));
-            exceptions.ForEach(ex =>
-            {
-                AnsiConsole.WriteException(ex);
-                AnsiConsole.WriteLine();
-            });
+                    var table = new Table();
+
+                    table.AddColumn("Solution");
+                    table.AddColumn("Time");
+                    table.AddRow(SolutionRenderable(solution), new Text(
+                        solution.Elapsed?.ToString() ?? "-",
+                        Style.Parse(solution.Elapsed.HasValue ? "blue" : "grey")
+                    ));
+
+                    AnsiConsole.Write(table);
+                    AnsiConsole.WriteLine();
+                });
+
         }
     }
 
-    private void WriteSolution(Table table, PartSolution solution, int partNumber)
+    private IRenderable SolutionRenderable(PartSolution solution)
     {
-        var row = partNumber - 1;
-
         switch (solution.Type)
         {
             case SolutionType.Skipped:
-                table.UpdateCell(row, 1, "[dim grey]Skipped[/]");
-                break;
+                return new Markup("[dim grey]Skipped[/]");
             case SolutionType.Error:
-                table.UpdateCell(row, 1, "[red]ERROR[/]");
-                break;
+                return new Markup("[red]ERROR[/]");
             case SolutionType.Valid:
-                table.UpdateCell(row, 1, new Text(solution.Answer!, Style.Parse("green")));
-                break;
+                return new Text(solution.Answer!, Style.Parse("green"));
+            default:
+                throw new NotSupportedException();
         }
-        table.UpdateCell(
-            row,
-            2,
-            new Text(
-                    solution.Elapsed?.ToString() ?? "-",
-                    Style.Parse(solution.Elapsed.HasValue ? "blue" : "grey")
-                )
-            );
-
     }
 }
