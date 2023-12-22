@@ -13,7 +13,7 @@ internal class Day20 : DayBase
 
     public override bool UseTestInput => false;
 
-    protected override PartToRun PartsToRun => PartToRun.Part2;
+    protected override PartToRun PartsToRun => PartToRun.Both;
 
     protected override async Task<string> SolvePart1(string input)
     {
