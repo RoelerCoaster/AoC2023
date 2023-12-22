@@ -1,6 +1,9 @@
+using csdot;
+using csdot.Attributes.DataTypes;
 using MoreLinq;
 using RoelerCoaster.AdventOfCode.Year2023.Internals.Model;
 using RoelerCoaster.AdventOfCode.Year2023.Util;
+using Spectre.Console;
 
 namespace RoelerCoaster.AdventOfCode.Year2023.Solutions.Day20;
 
@@ -10,7 +13,7 @@ internal class Day20 : DayBase
 
     public override bool UseTestInput => false;
 
-    protected override PartToRun PartsToRun => PartToRun.Both;
+    protected override PartToRun PartsToRun => PartToRun.Part2;
 
     protected override async Task<string> SolvePart1(string input)
     {
@@ -35,15 +38,43 @@ internal class Day20 : DayBase
 
         var rx = modules["rx"] as OutputModule ?? throw new InvalidOperationException();
 
+        /*
+         * Analysis of input: after the broadcaster the network splits in 4 subnetworks.
+         * 
+         * Each subnetwork is then combined into again a conjuction, which feeds the output.
+         * 
+         * So we have to detect cycles on the the inputs on the terminal conjunctions of the 4 subnetworks.
+         *
+         */
+
+        var conjunctionBeforeOutput = modules.Values
+            .Where(kp => kp is ConjunctionModule && kp.Targets.Contains("rx"))
+            .Select(m => (ConjunctionModule)m)
+            .Single();
+
+        var pressesFirstHigh = conjunctionBeforeOutput.InputMemory.Keys.ToDictionary(x => x, _ => -1);
+
         var presses = 0;
-        while (!rx.IsOn)
+
+        conjunctionBeforeOutput.InputHigh += (_, s) =>
         {
-            SimulateButtonPress(modules);
+            if (pressesFirstHigh[s] == -1)
+            {
+                pressesFirstHigh[s] = presses;
+            }
+        };
+
+        while (pressesFirstHigh.Values.Contains(-1))
+        {
             presses++;
+            SimulateButtonPress(modules);
         }
 
-        return presses.ToString();
+        var result = pressesFirstHigh.Values.Select(x => (long)x).Aggregate(MathUtil.LCM);
+
+        return result.ToString();
     }
+
 
     private (int LowCount, int HighCount) SimulateButtonPress(Dictionary<string, ModuleBase> modules)
     {
@@ -131,5 +162,36 @@ internal class Day20 : DayBase
             .ForEach(t => result[t] = new OutputModule(t));
 
         return result;
+    }
+
+    private void PrintDot(Dictionary<string, ModuleBase> modules)
+    {
+        var graph = new Graph
+        {
+            type = "digraph"
+        };
+
+        var nodes = modules.Values.Select(m =>
+        {
+            var node = new Node(m.Name);
+            node.Attribute.label.Value = $"{m.Name}-{m.GetType().Name}";
+
+            return node;
+        });
+
+        var edges = modules.Values.SelectMany(m =>
+        {
+            var edges = m.Targets.Select(t => new Edge([
+                new Transition(m.Name, EdgeOp.directed),
+                new Transition(t, EdgeOp.unspecified)
+            ])); ;
+
+            return edges;
+        });
+
+        graph.AddElements(nodes.ToArray());
+        graph.AddElements(edges.ToArray());
+
+        AnsiConsole.WriteLine(graph.ElementToString());
     }
 }
