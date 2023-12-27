@@ -14,6 +14,7 @@
 	<ItemGroup>
 	  <PackageReference Include="C5" Version="2.5.3" />
 	  <PackageReference Include="csdot" Version="2.0.1" />
+	  <PackageReference Include="Microsoft.Z3" Version="4.12.2" />
 	  <PackageReference Include="morelinq" Version="4.0.0" />
 	  <PackageReference Include="QuikGraph" Version="2.5.0" />
 	  <PackageReference Include="RangeTree" Version="3.0.1" />
